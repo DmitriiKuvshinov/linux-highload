@@ -11,18 +11,6 @@ variable "default_zone" {
   type    = string
   default = "ru-central1-a"
 }
-variable "subnet_id" {
-  type    = string
-  default = "e2le71tlh1gleciti6kd"
-}
-variable "default_cidr" {
-  type    = string
-  default = "10.129.0.0/24"
-}
-variable "vm_image" {
-  type    = string
-  default = "ubuntu-2404-lts"
-}
 
 variable "vms" {
   type = map(object({
