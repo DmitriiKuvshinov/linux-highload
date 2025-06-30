@@ -1,5 +1,5 @@
 # Local .terraform directories
-homework-1/.terraform/
+*/.terraform/
 .idea/
 
 # .tfstate files
@@ -37,3 +37,4 @@ override.tf.json
 .terraformrc
 terraform.rc
 authorized_key.json
+*/src/

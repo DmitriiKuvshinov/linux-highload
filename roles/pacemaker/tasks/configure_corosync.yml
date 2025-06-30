@@ -1,0 +1,19 @@
+- name: Create a corosync log directory
+  ansible.builtin.file:
+    path: /var/log/corosync
+    state: directory
+    mode: '0755'
+  notify: restart corosync
+
+- name: Copy corosync config
+  template:
+    src: corosync.conf
+    dest: /etc/corosync/corosync.conf
+  notify: restart corosync
+
+- name: Enable lockd
+  ansible.builtin.replace:
+    path: /etc/lvm/lvm.conf
+    regexp: '.*# use_lvmlockd = 0'
+    replace: '          use_lvmlockd = 1'
+  notify: start services

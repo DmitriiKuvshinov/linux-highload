@@ -1,0 +1,49 @@
+---
+- name: mount iscsi
+  include_tasks: iscsi.yml
+
+- meta: flush_handlers
+
+- name: configure packages
+  include_tasks: install_packages.yml
+
+- name: configure user for cluster
+  include_tasks: user.yml
+
+- name: configure corosync
+  include_tasks: configure_corosync.yml
+
+- meta: flush_handlers
+
+- name: create pv/vg/lv
+  include_tasks: filesystem.yml
+  run_once: true
+  when: init_gfs2 | default(false) | bool == true
+
+- block:
+    - name: Create pacemaker cluster
+      command: "{{ item }}"
+      loop:
+        - "pcs cluster auth -u hacluster -p {{ hacluster_passwrod }}"
+        - "pcs cluster enable --all"
+        - "pcs cluster start --all"
+      run_once: true
+
+    - name: Create DLVM/CLVM
+      command: "{{ item }}"
+      loop:
+        - "pcs property set stonith-enabled=false"
+        - "pcs property set no-quorum-policy=ignore"
+        - "pcs resource create dlm systemd:dlm op monitor interval=30s on-fail=ignore clone interleave=true ordered=true"
+        - "pcs resource create lvmlockd ocf:heartbeat:lvmlockd op monitor interval=30s on-fail=ignore clone interleave=true ordered=true"
+        - "pcs constraint order start dlm-clone then lvmlockd-clone"
+      run_once: true
+    - name: Create Filesystem resource
+      command: "{{ item }}"
+      loop:
+        - "pcs resource create clusterfs Filesystem device='/dev/vg_iscsi/lv_iscsi' directory='/data/iscsi' fstype='gfs2' options=noatime op monitor interval=10s on-fail=ignore clone interleave=true"
+        - "pcs constraint order start lvmlockd-clone then clusterfs-clone"
+        - "pcs constraint colocation add clusterfs-clone with lvmlockd-clone"
+      run_once: true
+  when: init_cluster | bool == true
+...

@@ -1,0 +1,20 @@
+---
+- name: install iscsi packges
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - iscsi-initiator-utils
+
+- name: Copy auth config
+  template:
+    src: iscsi.conf
+    dest: /etc/iscsi/iscsid.conf
+  notify: restart iscsi initiator
+
+- name: Copy initiator config
+  template:
+    src: initiatorname.iscsi
+    dest: /etc/iscsi/initiatorname.iscsi
+  notify: restart iscsi initiator
+...

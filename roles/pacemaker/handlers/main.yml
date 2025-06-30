@@ -1,0 +1,34 @@
+---
+- name: start services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - pcsd.service
+    - dlm.service
+    - lvmlockd.service
+  listen: start services
+
+- name: restart corosync
+  service:
+    name: corosync.service
+    state: restarted
+    enabled: true
+
+- name: restart iscsi initiator
+  service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: true
+  loop:
+    - iscsid
+  listen: restart iscsi initiator
+
+- name: Discover iscsi server
+  shell: "{{ item }}"
+  loop:
+    - "iscsiadm -m discovery -p {{ hostvars['iscsi-server']['local_address'] }} -t st"
+    - "iscsiadm -m node --login"
+  listen: restart iscsi initiator
+...

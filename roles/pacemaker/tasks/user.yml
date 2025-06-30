@@ -1,0 +1,15 @@
+---
+- name: Setup password for hacluster
+  user:
+    name: "hacluster"
+    password: "{{ hacluster_passwrod | password_hash('sha512') }}"
+
+- name: Configure sudo for hacluster user
+  community.general.sudoers:
+    name: wheel_group
+    state: present
+    user: "hacluster"
+    runas: ALL
+    commands: ALL
+    validation: required
+...

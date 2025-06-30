@@ -1,0 +1,33 @@
+---
+- name: Create physical partition
+  parted:
+    device: "/dev/sda"
+    number: 1
+    flags: [ lvm ]
+    state: present
+
+- name: Create volume group
+  lvg:
+    vg: "vg_iscsi"
+    pvs: "/dev/sda1"
+    pesize: 16
+    vg_options: "--shared"
+
+- name: Create logical volume
+  lvol:
+    vg: "vg_iscsi"
+    lv: "lv_iscsi"
+    size: 100%FREE
+    shrink: no
+
+- name: Create directory for mount
+  file:
+    path: "/data/iscsi"
+    state: directory
+    mode: '0755'
+
+- name: Create GFS2 filesystem and add to cluster
+  shell: "{{ item }}"
+  loop:
+    - "yes | mkfs.gfs2 -j2 -t otus:gfs2 /dev/vg_iscsi/lv_iscsi"
+...

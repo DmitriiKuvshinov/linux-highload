@@ -1,0 +1,60 @@
+---
+- name: install iscsi packges
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - tgt
+    - lvm2
+  when: "item not in ansible_facts.packages"
+
+- name: create PV
+  parted:
+    device: /dev/vdb
+    number: 1
+    flags: [ lvm ]
+    state: present
+    part_end: 8GB
+
+- name: task for creating volume group
+  lvg:
+    vg: iscsi-vg
+    pvs: /dev/vdb1
+    pesize: 16
+
+- name: task for creating logical volume
+  lvol:
+    vg: iscsi-vg
+    lv:  iscsi-lv
+    size: 6g
+    force: yes
+  register: iscsi_lvm
+
+- name: create dir for LUN image
+  file:
+    path: "/data/iscsi"
+    state: directory
+    mode: '0755'
+
+- name: format the xfs filesystem
+  filesystem:
+    fstype: xfs
+    dev: /dev/iscsi-vg/iscsi-lv
+
+- name: mount the lv on /data/iscsi
+  mount:
+    path: /data/iscsi
+    src: /dev/iscsi-vg/iscsi-lv
+    fstype: xfs
+    state: mounted
+
+- name: create LUN image
+  shell: "dd if=/dev/zero of=/data/iscsi/lun1.img count=0 bs=1 seek=5G"
+  when: iscsi_lvm.changed
+
+- name: Copy ISCSI config
+  template:
+    src: iscsi.conf
+    dest: /etc/tgt/conf.d/iscsi.conf
+  notify: restart tgt
+...

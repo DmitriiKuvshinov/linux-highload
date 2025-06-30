@@ -1,0 +1,8 @@
+---
+- name: restart tgt
+  service:
+    name: tgt
+    state: restarted
+    enabled: true
+
+...

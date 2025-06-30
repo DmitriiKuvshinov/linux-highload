@@ -1,8 +1,29 @@
 ---
-- name: Serverbase deployment
+- name: Common deployment
   hosts: all
   become: yes
-
   roles:
     - ping
+
+- name: iscsi server deployment
+  hosts: iscsi-server
+  become: yes
+
+  pre_tasks:
+    - name: Gather the package facts
+      ansible.builtin.package_facts:
+        manager: auto
+  roles:
+    - iscsi
+
+- name: Pacemaker deployment
+  hosts: nodes
+  become: yes
+
+  pre_tasks:
+    - name: Gather the package facts
+      ansible.builtin.package_facts:
+        manager: auto
+  roles:
+    - pacemaker
 ...

@@ -6,3 +6,18 @@ users:
     sudo: 'ALL=(ALL) NOPASSWD:ALL'
     ssh_authorized_keys:
       - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC5705GHIewksZxtv/9XiGPrjhkOo9RFIl/UYyn63lJ8aKG92ne8C7tSznZwr7j5mKRK2x0PMgkQTlGJURTSmSXRPppOffcGoy9dWVoqzzW3VRIOX2I3rA7vjQPgb3dZiEkTcJObV2bHyv3wMWyLOIM3mmKPz0YYyB5F3ZuOUqn5mCjHiSlHQnCFpo4OokwegIhYmbkL/f3MB2yalh/2gXBZ0bSvQK/uJG/pjQwhRWyAYRxzECZCL5evepbl8QJSkzx/X6Nzo8syQST0+bUl2lQ8UuqOZyr+JZsGUFkXbfR2gdsDRlLqhSOyu+P0Ji+ouYrqwT4oIfV7QZRBPdiZMmju/SChm4vAFhTVNiZHdmFYikkaGzwpH9S8b30b9zhOwibqHjD2Px6TDM1Hikjk0zWZWav59KPFKz9re4/BjUccQRb2hdhSgOaUxJ78ljsU2pmwhW2J7JvyKH0zE/szWHHBrjoUVjKsMaWQ2mJNmKZ7LXOSRVSRu+QtPiTwOtttcCLvPDZxILp7C5K+EjnGpc2TEC730da4anvYTAuY4ZZoFBoBw9qxJcNF6mXEMIM+Uw6TNmRMKCrbKCPJqSwSIOX4NWCgpgkfEJKEca0EPfFJzazEoghZaWseiUxqZRgtqXRaK6Hl6oHg7x9pYh9s311SE/ohNydGtJ/ImMNdRy4DQ== cardno:15_715_293"
+package_update: true
+packages:
+  - python3
+  - glibc-langpack-en
+
+runcmd:
+  - [sed -i 's/^LANG=.*/LANG="en_US.utf8"/' /etc/locale.conf]
+  - [sed -i 's/^LC_ALL=.*/LC_ALL="en_US.utf8"/' /etc/locale.conf]
+write_files:
+  - path: /etc/environment
+    content: |
+      LANG=en_US.utf8
+      LC_CTYPE=en_US.utf8
+      LC_ALL=en_US.utf8
+    append: true

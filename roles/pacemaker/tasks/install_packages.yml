@@ -1,0 +1,47 @@
+- name: Ensure the resilientstorage repository is enabled
+  community.general.dnf_config_manager:
+    name: resilientstorage
+    state: enabled
+
+- name: Install package
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - coreutils
+    - fontconfig
+    - gcc
+    - gcc-c++
+    - libffi-devel
+    - python3-devel
+    - ruby-devel
+    - rubygems
+    - wget
+    - pacemaker
+    - pcs
+    - resource-agents
+    - corosync
+    - lvm2-lockd
+    - fence-agents
+    - gfs2-utils
+    - lvm2
+    - sanlock
+  notify: start services
+  when: "item not in ansible_facts.packages"
+
+- block:
+  - name: Ensure the devel repository is enabled
+    dnf:
+      enablerepo: devel
+      state: present
+      update_cache: true
+  - name: Install dlm
+    package:
+      name: "dlm"
+      state: present
+  - name: Ensure the devel repository is disabled
+    dnf:
+      enablerepo: devel
+      state: absent
+      update_cache: true
+  when: "'dlm' not in ansible_facts.packages"
