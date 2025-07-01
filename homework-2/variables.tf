@@ -1,3 +1,7 @@
+variable "username" {
+  type = string
+  default = "dkuvshinov"
+}
 variable "token" {
   type = string
 }

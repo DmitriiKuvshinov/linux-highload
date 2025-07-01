@@ -15,6 +15,12 @@
 
 - meta: flush_handlers
 
+- name: Create directory for mount
+  file:
+    path: "/data/iscsi"
+    state: directory
+    mode: '0755'
+
 - name: create pv/vg/lv
   include_tasks: filesystem.yml
   run_once: true

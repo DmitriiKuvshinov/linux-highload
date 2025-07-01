@@ -20,14 +20,8 @@
     size: 100%FREE
     shrink: no
 
-- name: Create directory for mount
-  file:
-    path: "/data/iscsi"
-    state: directory
-    mode: '0755'
-
 - name: Create GFS2 filesystem and add to cluster
   shell: "{{ item }}"
   loop:
-    - "yes | mkfs.gfs2 -j2 -t otus:gfs2 /dev/vg_iscsi/lv_iscsi"
+    - "yes | mkfs.gfs2 -j2 -p lock_dlm -t otus:gfs2 /dev/vg_iscsi/lv_iscsi"
 ...
