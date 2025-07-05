@@ -1,0 +1,12 @@
+---
+- name: enable nginx
+  service:
+    name: nginx
+    enabled: yes
+
+#Note that reloaded will start the service if it is not already started
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded
+...

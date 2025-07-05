@@ -1,0 +1,19 @@
+---
+- name: create dirs
+  file:
+    path: "{{ item }}"
+    state: directory
+    recurse: true
+  loop:
+    - /var/docker/backdrop
+
+- name: copy backdrop compose file
+  copy:
+    src: backdrop.yml
+    dest: "/var/docker/backdrop/docker-compose.yaml"
+
+- name: Run docker-compose file
+  community.docker.docker_compose_v2:
+    project_src: "/var/docker/backdrop"
+    state: present
+...

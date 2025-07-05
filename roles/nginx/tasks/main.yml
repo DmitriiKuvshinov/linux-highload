@@ -1,0 +1,41 @@
+---
+- name: add an apt signing key for nginx repo
+  shell: 'wget -qO - https://cs.nginx.com/static/keys/nginx_signing.key |
+          gpg --dearmor |
+          tee /etc/apt/trusted.gpg.d/nginx-archive-keyring.gpg >/dev/null'
+  args:
+    creates: /etc/apt/trusted.gpg.d/nginx-archive-keyring.gpg
+
+- name: add specified nginx repository into sources list using specified filename
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+    filename: nginx
+  loop:
+    - deb https://nginx.org/packages/mainline/{{ansible_distribution|lower}}/ {{ansible_lsb.codename}} nginx
+    - deb-src https://nginx.org/packages/mainline/{{ansible_distribution|lower}}/ {{ansible_lsb.codename}} nginx
+
+- name: install nginx
+  package:
+    name: nginx
+    state: present
+  notify: enable nginx
+  when: "'nginx' not in ansible_facts.packages"
+
+- name: copy config files if needed
+  template:
+    src: '{{ item.src }}'
+    dest: /etc/nginx/conf.d/{{ item.path }}
+    owner: root
+    group: root
+    mode: 0644
+  with_community.general.filetree: files/{{inventory_hostname}}/sites/
+  notify: reload nginx
+  when: item.state == 'file'
+
+- name: delete nfinx default.conf
+  file:
+    path: /etc/nginx/conf.d/default.conf
+    state: absent
+  notify: reload nginx
+...
