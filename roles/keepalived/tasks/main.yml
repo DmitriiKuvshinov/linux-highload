@@ -1,0 +1,37 @@
+- name: install keepalived
+  package:
+    name: keepalived
+    state: present
+  notify: enable nginx
+  when: "'keepalived' not in ansible_facts.packages"
+
+- name: Enable forward IP packets
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_file: /etc/sysctl.conf
+    reload: true
+
+- name: Copy Master config
+  template:
+    src: "{{ inventory_hostname }}.conf"
+    dest: /etc/keepalived/keepalived.conf
+  notify: restart keepalived
+
+- meta: flush_handlers
+
+- block:
+  - name: Set arp_ignore
+    ansible.posix.sysctl:
+      name: net.ipv4.conf.eth0.arp_ignore
+      value: '1'
+      sysctl_file: /etc/sysctl.conf
+      reload: true
+
+  - name: Set arp_announce
+    ansible.posix.sysctl:
+      name: net.ipv4.conf.eth0.arp_announce
+      value: '2'
+      sysctl_file: /etc/sysctl.conf
+      reload: true
+  when: "inventory_hostname == 'front-1'"

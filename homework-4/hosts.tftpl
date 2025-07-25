@@ -1,0 +1,28 @@
+[all:children]
+frontend
+backend
+db
+iscsi
+
+[frontend]
+%{ for server in frontend ~}
+${server.name} ansible_host=%{ if server.network_interface[0].nat_ip_address != "" }${server.network_interface[0].nat_ip_address}%{endif} local_address=${server.network_interface[0].ip_address} ansible_user=dkuvshinov
+%{ endfor ~}
+
+[backend]
+%{ for server in backend ~}
+${server.name} ansible_host=%{ if server.network_interface[0].nat_ip_address != "" }${server.network_interface[0].nat_ip_address}%{endif} local_address=${server.network_interface[0].ip_address} ansible_user=dkuvshinov
+%{ endfor ~}
+
+[db]
+%{ for server in db ~}
+${server.name} ansible_host=%{ if server.network_interface[0].nat_ip_address != "" }${server.network_interface[0].nat_ip_address}%{endif} local_address=${server.network_interface[0].ip_address} ansible_user=dkuvshinov
+%{ endfor ~}
+
+[iscsi]
+%{ for server in iscsi ~}
+${server.name} ansible_host=%{ if server.network_interface[0].nat_ip_address != "" }${server.network_interface[0].nat_ip_address}%{endif} local_address=${server.network_interface[0].ip_address} ansible_user=dkuvshinov
+%{ endfor ~}
+
+[all:vars]
+keepalived_address=10.2.0.8

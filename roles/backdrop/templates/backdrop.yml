@@ -1,0 +1,15 @@
+services:
+  backdrop-1:
+    image: backdrop
+    environment:
+      - BACKDROP_DB_HOST={{ hostvars['db-1']['local_address'] }}
+      - BACKDROP_DB_PORT=3306
+      - BACKDROP_DB_USER=backdrop
+      - BACKDROP_DB_PASSWORD=backdrop
+    ports:
+      - '127.0.0.1:8081:80'
+    networks:
+      - cms
+networks:
+  cms:
+    driver: bridge

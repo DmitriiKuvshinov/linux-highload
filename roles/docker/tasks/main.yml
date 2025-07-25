@@ -1,9 +1,8 @@
 ---
 - name: ensure old versions of docker are not installed
-  apt:
+  package:
     name: "{{ item }}"
     state: absent
-    purge: yes
   loop:
     - containerd
     - docker-compose
@@ -23,25 +22,8 @@
     - gnupg
   when: item not in ansible_facts.packages
 
-- block:
-    - name: Add Docker key
-      get_url:
-        url: 'https://download.docker.com/linux/ubuntu/gpg'
-        dest: '/etc/apt/trusted.gpg.d/docker.asc'
-        mode: 0644
-
-    - name: 'Add Docker repo'
-      apt_repository:
-        repo: >
-          deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.asc]
-          https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
-        filename: 'docker.list'
-
-    - name: update cache
-      apt:
-        update_cache: true
-        cache_valid_time: 3600  #1 hour
-  when: '"docker-ce" not in ansible_facts.packages'
+- name: configure repos
+  include_tasks: "{{ (ansible_distribution) | lower }}.yml"
 
 - name: install docker components
   package:
@@ -54,4 +36,7 @@
     - docker-buildx-plugin
     - docker-compose-plugin
   when: item not in ansible_facts.packages
+  notify: start docker
+
+- meta: flush_handlers
 ...

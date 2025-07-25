@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mysql
+    environment:
+      MYSQL_USER: backdrop
+      MYSQL_PASSWORD: backdrop
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_DATABASE: backdrop
+    ports:
+      - {{ hostvars['db-1']['local_address'] }}:3306:3306
+    networks:
+      - cms
+networks:
+  cms:
+    driver: bridge

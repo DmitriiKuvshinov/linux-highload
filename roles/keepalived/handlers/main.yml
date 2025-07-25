@@ -1,0 +1,12 @@
+---
+- name: enable keepalived
+  service:
+    name: keepalived
+    enabled: yes
+
+#Note that reloaded will start the service if it is not already started
+- name: restart keepalived
+  service:
+    name: keepalived
+    state: restarted
+...

@@ -1,0 +1,40 @@
+---
+- name: Common deployment
+  hosts: all
+  become: yes
+  pre_tasks:
+    - name: Gather the package facts
+      ansible.builtin.package_facts:
+        manager: auto
+  roles:
+    - ping
+
+- name: iscsi server deployment
+  hosts: iscsi
+  become: yes
+  roles:
+    - iscsi
+
+- name: Frontend play
+  hosts: frontend
+  become: yes
+  roles:
+    - keepalived
+    - nginx
+
+- name: Database play
+  hosts: db
+  become: yes
+  roles:
+    - docker
+    - mysql
+
+- name: Backend play
+  hosts: backend
+  become: yes
+  roles:
+    #- pacemaker
+    - nginx
+    #- docker
+    #- backdrop
+...

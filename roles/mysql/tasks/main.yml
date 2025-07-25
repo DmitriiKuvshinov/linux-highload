@@ -5,15 +5,15 @@
     state: directory
     recurse: true
   loop:
-    - /var/docker/backdrop
+    - /var/docker/mysql
 
-- name: copy backdrop compose file
+- name: copy mysql compose file
   template:
-    src: backdrop.yml
-    dest: "/var/docker/backdrop/docker-compose.yaml"
+    src: mysql.yml
+    dest: "/var/docker/mysql/docker-compose.yaml"
 
 - name: Run docker-compose file
   community.docker.docker_compose_v2:
-    project_src: "/var/docker/backdrop"
+    project_src: "/var/docker/mysql"
     state: present
 ...

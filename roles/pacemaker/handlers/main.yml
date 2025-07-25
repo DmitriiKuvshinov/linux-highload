@@ -28,7 +28,7 @@
 - name: Discover iscsi server
   shell: "{{ item }}"
   loop:
-    - "iscsiadm -m discovery -p {{ hostvars['iscsi-server']['local_address'] }} -t st"
+    - "iscsiadm -m discovery -p {{ hostvars['iscsi']['local_address'] }} -t st"
     - "iscsiadm -m node --login"
   listen: restart iscsi initiator
 ...

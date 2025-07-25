@@ -15,6 +15,6 @@
 - name: Copy initiator config
   template:
     src: initiatorname.iscsi
-    dest: /etc/iscsi/initiatorname.iscsi
+    dest: c
   notify: restart iscsi initiator
 ...

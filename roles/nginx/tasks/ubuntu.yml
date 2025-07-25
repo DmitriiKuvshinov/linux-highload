@@ -1,0 +1,17 @@
+---
+- name: add an apt signing key for nginx repo
+  shell: 'wget -qO - https://cs.nginx.com/static/keys/nginx_signing.key |
+          gpg --dearmor |
+          tee /etc/apt/trusted.gpg.d/nginx-archive-keyring.gpg >/dev/null'
+  args:
+    creates: /etc/apt/trusted.gpg.d/nginx-archive-keyring.gpg
+
+- name: add specified nginx repository into sources list using specified filename
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+    filename: nginx
+  loop:
+    - deb https://nginx.org/packages/mainline/{{ansible_distribution|lower}}/ {{ansible_lsb.codename}} nginx
+    - deb-src https://nginx.org/packages/mainline/{{ansible_distribution|lower}}/ {{ansible_lsb.codename}} nginx
+...
